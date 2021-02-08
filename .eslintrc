@@ -1,0 +1,32 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/interface-name-prefix": 0,
+    "@typescript-eslint/indent": ["error", 2, { "SwitchCase": 1 }],
+    "linebreak-style": ["error", "unix"],
+    "no-console": 0,
+    "quotes": ["error", "single"],
+    "semi": 0,
+    "max-len": ["error", { "code": 200 }]
+  },
+  "env": {
+    "commonjs": true,
+    "es6": true,
+    "node": true,
+    "browser": false
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": false
+    },
+    "sourceType": "module"
+  }
+}
