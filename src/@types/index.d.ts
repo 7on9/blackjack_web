@@ -19,3 +19,5 @@ export interface IDeckValue {
 }
 
 export type TDuelResult = 'WIN' | 'LOSE' | 'DRAW'
+
+export type TGamePhase = 'WAITING_PLAYER' | 'PREPARE' | 'DIVIDE_CARDS' | 'DUEL'

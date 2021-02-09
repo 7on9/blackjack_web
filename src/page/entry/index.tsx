@@ -46,8 +46,6 @@ const Entry = () => {
     GAME_ACTIONS.joinGame(Number(idRoom), username)
   }
 
-  console.log('gameState', gameState)
-
   return gameState.room ? (
     <Redirect to={{ pathname: '/', state: { from: '/entry' } }} />
   ) : (

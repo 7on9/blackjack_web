@@ -1,8 +1,10 @@
-import { ICard, TPlayerStatus, TPlayerType } from '../../@types'
+import { ICard, TPlayerStatus, TPlayerType, TGamePhase } from '../../@types'
 import { GAME, PLAYER } from '../../constants'
 import { COMMON_ACTIONS } from './type'
 
 /* eslint-disable no-case-declarations */
+
+export type GAME_PHASE = 'WAITING_PLAYER' | 'PREPARE' | 'DIVIDE_CARDS' | 'DUEL'
 
 export interface IPlayer {
   cards: ICard[]
@@ -15,23 +17,27 @@ export interface IPlayer {
 export interface IRoom {
   players: IPlayer[]
   host: IPlayer | null
-  deck: ICard[]
+  deck: ICard[],
+  phase: TGamePhase
+  message: string
 }
 
 export interface IGameState {
-  players: IPlayer[],
-  room: IRoom | null,
-  status: TPlayerStatus | null,
-  endGame: true,
-  inGame: boolean,
-  thisPlayer: IPlayer,
+  message: string | null
+  gameStatus: string | null
+  room: IRoom | null
+  status: TPlayerStatus | null
+  endGame: true
+  inGame: boolean
+  thisPlayer: IPlayer
   requesting: boolean
   idRoom: number | null
 }
 
 const initialState: IGameState = {
   room: null,
-  players: [],
+  message: null,
+  gameStatus: null,
   status: null,
   endGame: true,
   inGame: false,
@@ -43,28 +49,36 @@ const initialState: IGameState = {
     cards: [],
     color: null,
   },
-  requesting: false
+  requesting: false,
 }
 
-export const gameReducer: (state: IGameState, action: any) => IGameState = (state = initialState, action: { type: string, payload: any }) => {
+export const gameReducer: (state: IGameState, action: any) => IGameState = (
+  state = initialState,
+  action: { type: string; payload: any }
+) => {
   switch (action.type) {
-    case COMMON_ACTIONS.REQUEST: 
+    case COMMON_ACTIONS.REQUEST:
       return {
         ...state,
-        requesting: true
+        requesting: true,
       }
-    case GAME.CREATE: 
-    case PLAYER.JOIN: 
-    case GAME.NEW_PLAYER: 
+    case PLAYER.JOIN:
+    case PLAYER.DRAW_CARD:
+    case GAME.CREATE:
+    case GAME.NEW_PLAYER:
+    case GAME.START:
       console.log('payload', action.payload)
       return {
         ...state,
         ...action.payload,
         endGame: false,
         inGame: true,
-        requesting: false
+        requesting: false,
       }
-    //   case GAME_TYPES.GAME.START:
+    case COMMON_ACTIONS.RESET: 
+      return {
+        ...initialState
+      }
     //   case GAME_TYPES.GAME.TIMEOUT:
     //   case GAME_TYPES.GAME.JOIN:
     //   case GAME_TYPES.GAME.CORRECT_ANSWER:
@@ -81,7 +95,7 @@ export const gameReducer: (state: IGameState, action: any) => IGameState = (stat
     //       ...state,
     //       result: false,
     //     }
-    //   case GAME_TYPES.GAME.END: 
+    //   case GAME_TYPES.GAME.END:
     //     return {
     //       ...state,
     //       ...payload,

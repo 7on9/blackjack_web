@@ -5,84 +5,82 @@ import io from 'socket.io-client'
 import { SOCKET_URL } from '../../common/connection'
 import { APP_CONSTANTS } from '../../common/constants'
 import { GAME, PLAYER, STATUS } from '../../constants'
-import { IRoom } from './reducer'
+import { IPlayer, IRoom } from './reducer'
 
 const socket = io.io(SOCKET_URL)
 
 interface IResponse {
-  status: 'ERROR' | 'SUCCESS',
-  code: number,
+  status: 'ERROR' | 'SUCCESS'
+  code: number
   data?: any
   message?: string
-} 
+}
 
 const configureSocket = (dispatch: any) => {
   socket.on('connect', () => {
     console.log('connected to server')
   })
 
-  socket.on(GAME.CREATE, (response: IResponse & { data?: { idRoom: number, room: IRoom } } ) => {
-    if (response.status === 'SUCCESS') {
-      console.log('response', response)
-      return dispatch({
-        type: GAME.CREATE,
-        payload: {
-          room: response.data?.room,
-          idRoom: response.data.idRoom,
-          thisPlayer: response.data.room.host
-        },
-      })
+  socket.on(
+    GAME.CREATE,
+    (response: IResponse & { data?: { idRoom: number; room: IRoom } }) => {
+      if (response.status === 'SUCCESS') {
+        return dispatch({
+          type: GAME.CREATE,
+          payload: {
+            room: response.data?.room,
+            idRoom: response.data.idRoom,
+            thisPlayer: response.data.room.host,
+          },
+        })
+      }
     }
+  )
+
+  socket.on(PLAYER.DRAW_CARD, (response: IResponse & { data?: { thisPlayer: IPlayer } }) => {
+    return dispatch({
+      type: PLAYER.DRAW_CARD,
+      payload: {
+        thisPlayer: response.data.thisPlayer
+      },
+    })
   })
 
-  socket.on(PLAYER.JOIN, (status: any, questions: any) => {
-    if (status === STATUS.DONE)
-      return dispatch({
-        type: GAME.START,
-        payload: {
-          result: true,
-          running: false,
-          questions,
-        },
-      })
+  socket.on(GAME.START, (response: IResponse & { data?: { thisPlayer: IPlayer } }) => {
+    return dispatch({
+      type: GAME.START,
+      payload: {
+        ...response.data
+      },
+    })
   })
 
-  socket.on(GAME.START, (status: any, questions: any) => {
-    if (status === STATUS.DONE)
-      return dispatch({
-        type: GAME.START,
-        payload: {
-          result: true,
-          running: false,
-          questions,
-        },
-      })
-  })
-
-  socket.on(PLAYER.JOIN, (response: IResponse & { data?: { idRoom: number, room: IRoom } } ) => {
-    console.log(status, response)
-    if (response.status === 'SUCCESS') {
-      return dispatch({
-        type: PLAYER.JOIN,
-        payload: {
-          ...response.data
-        },
-      })
-    } else {
-      return dispatch({
-        type: GAME.PHASE_DIVIDE_DECK,
-        payload: {
-          message: response.message
-        },
-      })
+  socket.on(
+    PLAYER.JOIN,
+    (response: IResponse & { data?: { idRoom: number; room: IRoom } }) => {
+      if (response.status === 'SUCCESS') {
+        return dispatch({
+          type: PLAYER.JOIN,
+          payload: {
+            ...response.data,
+          },
+        })
+      } else {
+        return dispatch({
+          type: PLAYER.JOIN,
+          payload: {
+            message: response.message,
+          },
+        })
+      }
     }
-  })
+  )
 
   socket.on(GAME.NEW_PLAYER, (response: IResponse) => {
     return dispatch({
       type: GAME.NEW_PLAYER,
       payload: {
-        ...response.data
+        ...response.data,
       },
     })
   })
@@ -151,26 +149,24 @@ const configureSocket = (dispatch: any) => {
 }
 
 const createGame = (username: string) => {
-  socket.emit(
-    GAME.CREATE,
-    username
-  )
+  socket.emit(GAME.CREATE, username)
 }
 
 const joinGame = (idRoom: number, username: string) => {
-  socket.emit(
-    PLAYER.JOIN,
-    idRoom,
-    username
-  )
+  socket.emit(PLAYER.JOIN, idRoom, username)
+}
+
+const divideDeck = (idRoom: number) => {
+  socket.emit(GAME.PHASE_DIVIDE_DECK, idRoom)
 }
 
 const endGame = (idGame: any) => {
   // socket.emit(GAME.END, idGame)
-  return (dispatch: (arg0: { type: string; payload: {} }) => any) => dispatch({
-    type: GAME.END_GAME,
-    payload: {}
-  })
+  return (dispatch: (arg0: { type: string; payload: {} }) => any) =>
+    dispatch({
+      type: GAME.END_GAME,
+      payload: {},
+    })
 }
 
 const timeout = (idGame: any) => {
@@ -178,7 +174,18 @@ const timeout = (idGame: any) => {
 }
 
 const startGame = (idQuest: any) => {
-  return (dispatch: (arg0: { type: string; payload: { players: never[]; code: any; result: boolean; running: boolean; idGame: any } }) => any) => {
+  return (
+    dispatch: (arg0: {
+      type: string
+      payload: {
+        players: never[]
+        code: any
+        result: boolean
+        running: boolean
+        idGame: any
+      }
+    }) => any
+  ) => {
     // // QuestService.startGame(idQuest)
     // //   .then(res => res.data)
     // //   .then(res => {
@@ -237,7 +244,6 @@ const resetResult = () => {
   }
 }
 
-
 export const GAME_ACTIONS = {
   createGame,
   joinGame,
@@ -249,6 +255,7 @@ export const GAME_ACTIONS = {
   // endGame,
   resetCorrect,
   resetResult,
+  divideDeck,
 }
 
 export default configureSocket

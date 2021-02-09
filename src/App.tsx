@@ -3,10 +3,11 @@ import logo from './logo.svg'
 import './App.css'
 import { Card } from './components'
 import { ICard } from './@types'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IGlobalState } from './store/appReducer'
 import { Redirect } from 'react-router-dom'
 import { IPlayer } from './store/socket/reducer'
+import { GAME_ACTIONS } from './store/socket/socket'
 
 const App = () => {
   const [flip, setFlip] = useState(false)
@@ -65,11 +66,18 @@ const App = () => {
     player,
     isThisPlayer = false,
   }) => {
+    isThisPlayer = player?.username == gameState.thisPlayer.username
+    if (isThisPlayer) {
+      cards = gameState.thisPlayer.cards
+    } else {
+      cards = player?.cards
+    }
     return (
       <div className="d-flex w-100 h-100" style={{ flexDirection: 'column' }}>
         <div className="d-flex" style={{ flex: 2 }}>
           <Card
             card={cards ? cards[0] : undefined}
+            canFlip={isThisPlayer}
             placeHolder={!(cards && cards[0])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
@@ -82,6 +90,7 @@ const App = () => {
           <Card
             card={cards ? cards[1] : undefined}
             placeHolder={!(cards && cards[1])}
+            canFlip={isThisPlayer}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -93,6 +102,7 @@ const App = () => {
           <Card
             card={cards ? cards[2] : undefined}
             placeHolder={!(cards && cards[2])}
+            canFlip={isThisPlayer}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -104,6 +114,7 @@ const App = () => {
           <Card
             card={cards ? cards[3] : undefined}
             placeHolder={!(cards && cards[3])}
+            canFlip={isThisPlayer}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -115,6 +126,7 @@ const App = () => {
           <Card
             card={cards ? cards[4] : undefined}
             placeHolder={!(cards && cards[4])}
+            canFlip={isThisPlayer}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -132,6 +144,13 @@ const App = () => {
         </div>
       </div>
     )
+  }
+
+  console.log('gameState', gameState)
+
+  const onDivideDeck = () => {
+    console.log('')
+    gameState.idRoom && GAME_ACTIONS.divideDeck(gameState.idRoom)
   }
 
   return gameState.room ? (
@@ -182,7 +201,7 @@ const App = () => {
                   transform: 'translateX(-50%)',
                   paddingTop: 16,
                 }}>
-                Phòng: {gameState.idRoom} | Chủ xị: {gameState.room?.host?.username}
+                Phòng: {gameState.idRoom} - Chủ xị: {gameState.room?.host?.username}
               </div>
               <div
                 style={{
@@ -191,7 +210,7 @@ const App = () => {
                   transform: 'translateX(-50%)',
                   paddingTop: 8,
                 }}>
-                Người chơi: "SSSS" đang bốc bài
+                {gameState.room.message}
               </div>
               <div className="d-flex" style={{ flex: 2, position: 'relative', left: '50%', transform: 'translateX(-25%)', marginTop: 50 }}>
                 <Card
@@ -263,6 +282,7 @@ const App = () => {
                 Ván mới
               </button>
               <button
+                onClick={onDivideDeck}
                 style={{ position: 'absolute', bottom: 0, left: 0, margin: 4 }}
                 type="button"
                 className="btn btn-success">
