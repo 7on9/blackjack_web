@@ -3,9 +3,14 @@ import logo from './logo.svg'
 import './App.css'
 import { Card } from './components'
 import { ICard } from './@types'
+import { useSelector } from 'react-redux'
+import { IGlobalState } from './store/appReducer'
+import { Redirect } from 'react-router-dom'
+import { IPlayer } from './store/socket/reducer'
 
 const App = () => {
   const [flip, setFlip] = useState(false)
+  const gameState = useSelector((state: IGlobalState) => state.game)
   const Deck = () => {
     const deck = []
     for (let index = 0; index < 52; index++) {
@@ -55,15 +60,17 @@ const App = () => {
       </div>
     )
   }
-  const PlayerPosition: FC<{ cards?: ICard[]; isThisPlayer?: boolean }> = ({
+  const PlayerPosition: FC<{ cards?: ICard[]; isThisPlayer?: boolean, player?: IPlayer }> = ({
     cards,
+    player,
     isThisPlayer = false,
   }) => {
     return (
       <div className="d-flex w-100 h-100" style={{ flexDirection: 'column' }}>
         <div className="d-flex" style={{ flex: 2 }}>
           <Card
-            card={{ value: 'A', kind: 'spade' }}
+            card={cards ? cards[0] : undefined}
+            placeHolder={!(cards && cards[0])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -73,7 +80,8 @@ const App = () => {
             cardContentStyle={{ padding: '0.1rem' }}
           />
           <Card
-            placeHolder={true}
+            card={cards ? cards[1] : undefined}
+            placeHolder={!(cards && cards[1])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -83,7 +91,8 @@ const App = () => {
             cardContentStyle={{ padding: '0.1rem' }}
           />
           <Card
-            card={{ value: 3, kind: 'diamond' }}
+            card={cards ? cards[2] : undefined}
+            placeHolder={!(cards && cards[2])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -93,7 +102,8 @@ const App = () => {
             cardContentStyle={{ padding: '0.1rem' }}
           />
           <Card
-            card={{ value: 4, kind: 'club' }}
+            card={cards ? cards[3] : undefined}
+            placeHolder={!(cards && cards[3])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -103,7 +113,8 @@ const App = () => {
             cardContentStyle={{ padding: '0.1rem' }}
           />
           <Card
-            card={{ value: 'K', kind: 'diamond' }}
+            card={cards ? cards[4] : undefined}
+            placeHolder={!(cards && cards[4])}
             containerStyle={{
               width: window.innerWidth / 4 / 5 - 9,
               height: (window.innerWidth / 4 / 5 - 9) * 1.4,
@@ -114,8 +125,7 @@ const App = () => {
           />
         </div>
         <div className="d-flex" style={{ flex: 1, flexDirection: 'row' }}>
-          <div style={{ flex: 1 }}>Chos Chinh</div>
-
+          <div style={{ flex: 1 }}>{player?.username}</div>
           {isThisPlayer ? (
             <PlayingButtons />
           ) : null}
@@ -124,7 +134,7 @@ const App = () => {
     )
   }
 
-  return (
+  return gameState.room ? (
     <div className="App">
       <table
         style={{
@@ -138,31 +148,42 @@ const App = () => {
           color: 'white',
         }}>
         <thead>
-          <th className="w-25p" />
-          <th className="w-25p" />
-          <th className="w-25p" />
-          <th className="w-25p" />
+          <tr>
+            <th className="w-25p" />
+            <th className="w-25p" />
+            <th className="w-25p" />
+            <th className="w-25p" />
+          </tr>
         </thead>
         <tbody>
           <tr>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[0]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[1]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[2]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[3]} />
             </td>
-          </tr>
+          </tr>  
           <tr>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[11]} />
             </td>
             <td colSpan={2} rowSpan={2} style={{ position: 'relative' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  paddingTop: 16,
+                }}>
+                Phòng: {gameState.idRoom} | Chủ xị: {gameState.room?.host?.username}
+              </div>
               <div
                 style={{
                   position: 'relative',
@@ -270,36 +291,36 @@ const App = () => {
               </div>
             </td>
             <td>
-              <PlayerPosition isThisPlayer={true} />
+              <PlayerPosition player={gameState.room.players[4]} isThisPlayer={true} />
             </td>
           </tr>
           <tr>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[10]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[5]} />
             </td>
           </tr>
           <tr>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[9]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[8]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[7]} />
             </td>
             <td>
-              <PlayerPosition />
+              <PlayerPosition player={gameState.room.players[6]} />
             </td>
           </tr>
         </tbody>
       </table>
       {/* <Deck /> */}
     </div>
-  )
+  ) : <Redirect to={{ pathname: '/entry' }} />
 }
 
 export default App

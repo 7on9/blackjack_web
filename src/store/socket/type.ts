@@ -1,0 +1,3 @@
+export const COMMON_ACTIONS = {
+  REQUEST: 'ACTION/COMMON/REQUEST'
+}
