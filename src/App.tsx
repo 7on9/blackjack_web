@@ -38,19 +38,19 @@ const App = () => {
           style={{ flex: 1, margin: 4 }}
           type="button"
           className="btn btn-success">
-        Bốc
+          Bốc
         </button>
         <button
           style={{ flex: 1, margin: 4 }}
           type="button"
           className="btn btn-danger">
-        Dằn
+          Dằn
         </button>
         <button
           style={{ flex: 1, margin: 4 }}
           type="button"
           className="btn btn-warning">
-        Show hand
+          Show hand
         </button>
         {/* <button
     style={{ flex: 1, margin: 4 }}
@@ -61,86 +61,40 @@ const App = () => {
       </div>
     )
   }
-  const PlayerPosition: FC<{ cards?: ICard[]; isThisPlayer?: boolean, player?: IPlayer }> = ({
-    cards,
-    player,
-    isThisPlayer = false,
-  }) => {
-    isThisPlayer = player?.username == gameState.thisPlayer.username
+
+  const PlayerPosition: FC<{
+    cards?: ICard[]
+    isThisPlayer?: boolean
+    player?: IPlayer
+  }> = ({ cards, player, isThisPlayer = false }) => {
+    isThisPlayer = player?.username == thisPlayer.username
     if (isThisPlayer) {
-      cards = gameState.thisPlayer.cards
+      cards = thisPlayer.cards
     } else {
       cards = player?.cards
     }
     return (
       <div className="d-flex w-100 h-100" style={{ flexDirection: 'column' }}>
         <div className="d-flex" style={{ flex: 2 }}>
-          <Card
-            card={cards ? cards[0] : undefined}
-            canFlip={isThisPlayer}
-            placeHolder={!(cards && cards[0])}
-            containerStyle={{
-              width: window.innerWidth / 4 / 5 - 9,
-              height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-              margin: 4,
-              padding: 0,
-            }}
-            cardContentStyle={{ padding: '0.1rem' }}
-          />
-          <Card
-            card={cards ? cards[1] : undefined}
-            placeHolder={!(cards && cards[1])}
-            canFlip={isThisPlayer}
-            containerStyle={{
-              width: window.innerWidth / 4 / 5 - 9,
-              height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-              margin: 4,
-              padding: 0,
-            }}
-            cardContentStyle={{ padding: '0.1rem' }}
-          />
-          <Card
-            card={cards ? cards[2] : undefined}
-            placeHolder={!(cards && cards[2])}
-            canFlip={isThisPlayer}
-            containerStyle={{
-              width: window.innerWidth / 4 / 5 - 9,
-              height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-              margin: 4,
-              padding: 0,
-            }}
-            cardContentStyle={{ padding: '0.1rem' }}
-          />
-          <Card
-            card={cards ? cards[3] : undefined}
-            placeHolder={!(cards && cards[3])}
-            canFlip={isThisPlayer}
-            containerStyle={{
-              width: window.innerWidth / 4 / 5 - 9,
-              height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-              margin: 4,
-              padding: 0,
-            }}
-            cardContentStyle={{ padding: '0.1rem' }}
-          />
-          <Card
-            card={cards ? cards[4] : undefined}
-            placeHolder={!(cards && cards[4])}
-            canFlip={isThisPlayer}
-            containerStyle={{
-              width: window.innerWidth / 4 / 5 - 9,
-              height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-              margin: 4,
-              padding: 0,
-            }}
-            cardContentStyle={{ padding: '0.1rem' }}
-          />
+          {[0, 1, 2, 3, 4].map((id) => (
+            <Card
+              key={id}
+              card={cards ? cards[id] : undefined}
+              canFlip={isThisPlayer}
+              placeHolder={!(cards && cards[id])}
+              containerStyle={{
+                width: window.innerWidth / 4 / 5 - 9,
+                height: (window.innerWidth / 4 / 5 - 9) * 1.4,
+                margin: 4,
+                padding: 0,
+              }}
+              cardContentStyle={{ padding: '0.1rem' }}
+            />
+          ))}
         </div>
         <div className="d-flex" style={{ flex: 1, flexDirection: 'row' }}>
           <div style={{ flex: 1 }}>{player?.username}</div>
-          {isThisPlayer ? (
-            <PlayingButtons />
-          ) : null}
+          {isThisPlayer ? <PlayingButtons /> : null}
         </div>
       </div>
     )
@@ -149,9 +103,10 @@ const App = () => {
   console.log('gameState', gameState)
 
   const onDivideDeck = () => {
-    console.log('')
-    gameState.idRoom && GAME_ACTIONS.divideDeck(gameState.idRoom)
+    thisPlayer.role === 'HOST' && gameState.idRoom && GAME_ACTIONS.divideDeck(gameState.idRoom)
   }
+
+  const { thisPlayer } = gameState
 
   return gameState.room ? (
     <div className="App">
@@ -188,7 +143,7 @@ const App = () => {
             <td>
               <PlayerPosition player={gameState.room.players[3]} />
             </td>
-          </tr>  
+          </tr>
           <tr>
             <td>
               <PlayerPosition player={gameState.room.players[11]} />
@@ -201,7 +156,8 @@ const App = () => {
                   transform: 'translateX(-50%)',
                   paddingTop: 16,
                 }}>
-                Phòng: {gameState.idRoom} - Chủ xị: {gameState.room?.host?.username}
+                Phòng: {gameState.idRoom} - Chủ xị:{' '}
+                {gameState.room?.host?.username}
               </div>
               <div
                 style={{
@@ -212,57 +168,30 @@ const App = () => {
                 }}>
                 {gameState.room.message}
               </div>
-              <div className="d-flex" style={{ flex: 2, position: 'relative', left: '50%', transform: 'translateX(-25%)', marginTop: 50 }}>
-                <Card
-                  card={{ value: 'A', kind: 'spade' }}
-                  containerStyle={{
-                    width: window.innerWidth / 4 / 5 - 9,
-                    height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-                    margin: 4,
-                    padding: 0,
-                  }}
-                  cardContentStyle={{ padding: '0.1rem' }}
-                />
-                <Card
-                  card={{ value: 2, kind: 'heart' }}
-                  containerStyle={{
-                    width: window.innerWidth / 4 / 5 - 9,
-                    height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-                    margin: 4,
-                    padding: 0,
-                  }}
-                  cardContentStyle={{ padding: '0.1rem' }}
-                />
-                <Card
-                  card={{ value: 3, kind: 'diamond' }}
-                  containerStyle={{
-                    width: window.innerWidth / 4 / 5 - 9,
-                    height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-                    margin: 4,
-                    padding: 0,
-                  }}
-                  cardContentStyle={{ padding: '0.1rem' }}
-                />
-                <Card
-                  card={{ value: 4, kind: 'club' }}
-                  containerStyle={{
-                    width: window.innerWidth / 4 / 5 - 9,
-                    height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-                    margin: 4,
-                    padding: 0,
-                  }}
-                  cardContentStyle={{ padding: '0.1rem' }}
-                />
-                <Card
-                  card={{ value: 'K', kind: 'diamond' }}
-                  containerStyle={{
-                    width: window.innerWidth / 4 / 5 - 9,
-                    height: (window.innerWidth / 4 / 5 - 9) * 1.4,
-                    margin: 4,
-                    padding: 0,
-                  }}
-                  cardContentStyle={{ padding: '0.1rem' }}
-                />
+              <div
+                className="d-flex"
+                style={{
+                  flex: 2,
+                  position: 'relative',
+                  left: '50%',
+                  transform: 'translateX(-25%)',
+                }}>
+                {gameState.room && gameState.room.host && [0, 1, 2, 3, 4].map((id) => (
+                  <Card
+                    key={id}
+                    card={thisPlayer.role === 'HOST' ? thisPlayer.cards[id] :
+                     gameState.room?.host?.cards ? gameState.room?.host?.cards[id] : undefined}
+                    canFlip={thisPlayer.role === 'HOST'}
+                    placeHolder={!(gameState.room?.host?.cards && gameState.room?.host?.cards[id])}
+                    containerStyle={{
+                      width: window.innerWidth / 4 / 5 - 9,
+                      height: (window.innerWidth / 4 / 5 - 9) * 1.4,
+                      margin: 4,
+                      padding: 0,
+                    }}
+                    cardContentStyle={{ padding: '0.1rem' }}
+                  />
+                ))}
               </div>
               <div
                 style={{
@@ -270,7 +199,7 @@ const App = () => {
                   // backgroundColor: green;
                   height: '50%',
                   position: 'relative',
-                  left: '50%',
+                  left: '10%',
                   transform: 'translateX(-35%)',
                 }}>
                 <Deck />
@@ -278,22 +207,29 @@ const App = () => {
               <button
                 style={{ position: 'absolute', top: 0, left: 0, margin: 4 }}
                 type="button"
-                className="btn btn-success">
+                className="btn btn-danger">
                 Ván mới
               </button>
               <button
                 onClick={onDivideDeck}
                 style={{ position: 'absolute', bottom: 0, left: 0, margin: 4 }}
                 type="button"
-                className="btn btn-success">
+                {...((gameState.room.phase == 'PREPARE' || gameState.room.phase == 'WAITING_PLAYER') && thisPlayer.role === 'HOST' ? { disabled: false } : { disabled: true })}
+                className="btn btn-success" >
                 Chia bài
               </button>
-              <div style={{ position: 'absolute', bottom: 0, right: 0, margin: 4 }}> 
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  margin: 4,
+                }}>
                 <button
                   style={{ flex: 1, margin: 4 }}
                   type="button"
                   className="btn btn-success">
-                    Đổi vòng
+                  Đổi vòng
                 </button>
                 <button
                   style={{ flex: 1, margin: 4 }}
@@ -311,7 +247,7 @@ const App = () => {
               </div>
             </td>
             <td>
-              <PlayerPosition player={gameState.room.players[4]} isThisPlayer={true} />
+              <PlayerPosition player={gameState.room.players[4]} />
             </td>
           </tr>
           <tr>
@@ -340,7 +276,9 @@ const App = () => {
       </table>
       {/* <Deck /> */}
     </div>
-  ) : <Redirect to={{ pathname: '/entry' }} />
+  ) : (
+    <Redirect to={{ pathname: '/entry' }} />
+  )
 }
 
 export default App
