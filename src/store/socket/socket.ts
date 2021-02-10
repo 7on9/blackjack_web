@@ -84,18 +84,24 @@ const configureSocket = (dispatch: any) => {
       },
     })
   })
+  
+  socket.on(PLAYER.HOLD, (response: IResponse) => {
+    return dispatch({
+      type: PLAYER.HOLD,
+      payload: {
+        ...response.data,
+      },
+    })
+  })
 
-  //   socket.on(GAME.TIMEOUT, () => {
-  //     return dispatch({
-  //       type: GAME.BEGIN,
-  //       payload: {
-  //         timeout: true,
-  //         newQuestion: false,
-  //         result: true,
-  //         running: false,
-  //       },
-  //     })
-  //   })
+  socket.on(PLAYER.SHUFFLE_DECK, (response: IResponse) => {
+    return dispatch({
+      type: PLAYER.SHUFFLE_DECK,
+      payload: {
+        ...response.data,
+      },
+    })
+  })
 
   //   socket.on(GAME.NEW_QUESTION, (idQuestion: any) => {
   //     return dispatch({
@@ -134,16 +140,14 @@ const configureSocket = (dispatch: any) => {
   //     })
   //   })
 
-  //   socket.on(GAME.END, (scoreBoard: any) => {
-  //     console.log(scoreBoard)
-  //     return dispatch({
-  //       type: GAME.END,
-  //       payload: {
-  //         players: scoreBoard,
-  //         username: '',
-  //       },
-  //     })
-  //   })
+  socket.on(GAME.END_GAME, (response: IResponse) => {
+    return dispatch({
+      type: GAME.END_GAME,
+      payload: {
+        ...response.data
+      },
+    })
+  })
 
   return socket
 }
@@ -156,84 +160,32 @@ const joinGame = (idRoom: number, username: string) => {
   socket.emit(PLAYER.JOIN, idRoom, username)
 }
 
+const shuffleDeck = (idRoom: number, username: string) => {
+  socket.emit(PLAYER.SHUFFLE_DECK, idRoom, username)
+}
+
 const divideDeck = (idRoom: number) => {
   socket.emit(GAME.PHASE_DIVIDE_DECK, idRoom)
 }
 
-const endGame = (idGame: any) => {
-  // socket.emit(GAME.END, idGame)
-  return (dispatch: (arg0: { type: string; payload: {} }) => any) =>
-    dispatch({
-      type: GAME.END_GAME,
-      payload: {},
-    })
+const drawCard = (idRoom: number, username: string) => {
+  socket.emit(PLAYER.DRAW_CARD, idRoom, username)
 }
 
-const timeout = (idGame: any) => {
-  socket.emit(GAME.NEW_PLAYER, idGame)
+const hold = (idRoom: number, username: string) => {
+  socket.emit(PLAYER.HOLD, idRoom, username)
 }
 
-const startGame = (idQuest: any) => {
-  return (
-    dispatch: (arg0: {
-      type: string
-      payload: {
-        players: never[]
-        code: any
-        result: boolean
-        running: boolean
-        idGame: any
-      }
-    }) => any
-  ) => {
-    // // QuestService.startGame(idQuest)
-    // //   .then(res => res.data)
-    // //   .then(res => {
-    // //     socket.emit(GAME.START, res.code, idQuest)
-    // //     return dispatch({
-    // //       type: GAME.START,
-    // //       payload: {
-    // //         players: [],
-    // //         code: res.code,
-    // //         result: true,
-    // //         running: false,
-    // //         idGame: res.idGame,
-    // //       },
-    // //     })
-    // //   })
-    //   .catch(err => console.log(err))
-  }
+const endGame = (idRoom: number, username: string) => {
+  socket.emit(GAME.END_GAME, idRoom, username)
 }
 
-const nextQuestion = (idGame: any, idQuestion: any) => {
-  socket.emit(GAME.PHASE_DIVIDE_DECK, idGame, idQuestion)
-  return (dispatch: (arg0: { type: string; payload: {} }) => void) => {
-    dispatch({
-      type: GAME.PHASE_DIVIDE_DECK,
-      payload: {},
-    })
-  }
-}
-
-const answer = (idGame: any, idQuestion: any, answer: any) => {
-  socket.emit(GAME.START, idGame, idQuestion, answer)
-}
 // const endGame = (idGame) => {
 //   return dispatch => {
 //       socket.emit(GAME.END, idGame);
 //     }
 // }
 
-const resetCorrect = () => {
-  return {
-    type: 'dsad',
-    payload: {
-      correct: 0,
-      result: false,
-      running: false,
-    },
-  }
-}
 const resetResult = () => {
   return {
     type: STATUS.LOSE,
@@ -248,14 +200,11 @@ export const GAME_ACTIONS = {
   createGame,
   joinGame,
   endGame,
-  timeout,
-  startGame,
-  nextQuestion,
-  answer,
-  // endGame,
-  resetCorrect,
+  hold,
   resetResult,
   divideDeck,
+  shuffleDeck,
+  drawCard,
 }
 
 export default configureSocket

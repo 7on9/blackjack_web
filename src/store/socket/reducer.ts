@@ -20,6 +20,7 @@ export interface IRoom {
   deck: ICard[],
   phase: TGamePhase
   message: string
+  currentTurn: number
 }
 
 export interface IGameState {
@@ -50,6 +51,7 @@ const initialState: IGameState = {
     color: null,
   },
   requesting: false,
+  
 }
 
 export const gameReducer: (state: IGameState, action: any) => IGameState = (
@@ -67,6 +69,8 @@ export const gameReducer: (state: IGameState, action: any) => IGameState = (
     case GAME.CREATE:
     case GAME.NEW_PLAYER:
     case GAME.START:
+    case PLAYER.SHUFFLE_DECK:
+    case PLAYER.HOLD:
       console.log('payload', action.payload)
       return {
         ...state,
