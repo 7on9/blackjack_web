@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import { Card } from './components'
-import { ICard } from './@types'
+import { ICard, TPlayerType } from './@types'
 import { useDispatch, useSelector } from 'react-redux'
 import { IGlobalState } from './store/appReducer'
 import { Redirect } from 'react-router-dom'
@@ -34,6 +34,7 @@ const App = () => {
   }
 
   const PlayingButtons: FC<{ player?: IPlayer }> = ({ player }) => {
+    // console.log('player', player)
     const onDrawCard = () => {
       gameState && gameState.idRoom && player && GAME_ACTIONS.drawCard(gameState.idRoom, player.username)
     }
@@ -42,10 +43,11 @@ const App = () => {
       gameState && gameState.idRoom && player && GAME_ACTIONS.hold(gameState.idRoom, player.username)
     }
     
-    const onShowHand = () => {
-      gameState && gameState.idRoom && player && GAME_ACTIONS.drawCard(gameState.idRoom, player.username)
+    const onShowHand = (role: TPlayerType) => {
+      gameState && gameState.idRoom && player && GAME_ACTIONS.showHand(gameState.idRoom, player.username, role)
     }
-    return player ? (
+    
+    return player ? thisPlayer.role != 'HOST' || player.role == 'HOST' ? (
       <div className="d-flex" style={{ flex: 1 }}>
         <button
           onClick={onDrawCard}
@@ -68,7 +70,7 @@ const App = () => {
           Dằn
         </button>}
         <button
-          onClick={onShowHand}
+          onClick={() => onShowHand(player.role)}
           style={{ flex: 1, margin: 4 }}
           type="button"
           {...(player.status === 'DRAW'
@@ -84,7 +86,16 @@ const App = () => {
     Bốc
   </button> */}
       </div>
-    ) : null
+    ) : (
+      <div className="d-flex" style={{ flex: 1 }}>
+        <button
+          onClick={() => onShowHand('HOST')}
+          style={{ flex: 1, margin: 4 }}
+          type="button"
+          className="btn btn-success">
+          Xét bài
+        </button>
+      </div>) : null
   }
 
   const PlayerPosition: FC<{
@@ -105,7 +116,8 @@ const App = () => {
             <Card
               key={id}
               card={cards ? cards[id] : undefined}
-              canFlip={isThisPlayer}
+              canFlip={isThisPlayer || player?.status == 'SHOW_HAND'}
+              defaultSide={player?.status == 'SHOW_HAND' ? 'front' : 'back'}
               placeHolder={!(cards && cards[id])}
               containerStyle={{
                 width: window.innerWidth / 4 / 5 - 9,
@@ -128,15 +140,23 @@ const App = () => {
             ) : (
               <span className="badge badge-danger">Dằn</span>
             )}
+            <br />
+            {!player ? null : !player.duelResult ? null : player.duelResult === 'DRAW' ? (
+              <span className="badge badge-info">Hòa</span>
+            ) : player?.duelResult == 'WIN' ? (
+              <span className="badge badge-success">Thắng</span>
+            ) : (
+              <span className="badge badge-danger">Thua</span>
+            )}
           </div>
 
-          {isThisPlayer ? <PlayingButtons player={player} /> : null}
+          {isThisPlayer || thisPlayer.role == 'HOST' ? <PlayingButtons player={player} /> : null}
         </div>
       </div>
     )
   }
 
-  console.log('gameState', gameState)
+  // console.log('gameState', gameState)
 
   const onDivideDeck = () => {
     thisPlayer.role === 'HOST' &&
@@ -215,7 +235,7 @@ const App = () => {
                 {
                   !gameState || !gameState.room || !gameState.room.host ? null : gameState.room.host.status == null ? (
                     <span className="badge badge-info">Đang đợi</span>
-                  ) : thisPlayer?.status === 'DRAW' ? (
+                  ) : gameState.room.host.status === 'DRAW' ? (
                     <span className="badge badge-success">Đang bốc</span>
                   ) : (
                     <span className="badge badge-danger">Dằn</span>

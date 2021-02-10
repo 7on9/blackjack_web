@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import io from 'socket.io-client'
+import { TPlayerType } from '../../@types'
 import { SOCKET_URL } from '../../common/connection'
 import { APP_CONSTANTS } from '../../common/constants'
 import { GAME, PLAYER, STATUS } from '../../constants'
@@ -93,6 +94,15 @@ const configureSocket = (dispatch: any) => {
       },
     })
   })
+  
+  socket.on(PLAYER.SHOW_HAND, (response: IResponse) => {
+    return dispatch({
+      type: PLAYER.SHOW_HAND,
+      payload: {
+        ...response.data,
+      },
+    })
+  })
 
   socket.on(PLAYER.SHUFFLE_DECK, (response: IResponse) => {
     return dispatch({
@@ -176,6 +186,10 @@ const hold = (idRoom: number, username: string) => {
   socket.emit(PLAYER.HOLD, idRoom, username)
 }
 
+const showHand = (idRoom: number, username: string, role: TPlayerType) => {
+  socket.emit(PLAYER.SHOW_HAND, idRoom, username, role)
+}
+
 const endGame = (idRoom: number, username: string) => {
   socket.emit(GAME.END_GAME, idRoom, username)
 }
@@ -205,6 +219,7 @@ export const GAME_ACTIONS = {
   divideDeck,
   shuffleDeck,
   drawCard,
+  showHand,
 }
 
 export default configureSocket

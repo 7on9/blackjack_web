@@ -1,4 +1,4 @@
-import { ICard, TPlayerStatus, TPlayerType, TGamePhase } from '../../@types'
+import { ICard, TPlayerStatus, TPlayerType, TGamePhase, TDuelResult } from '../../@types'
 import { GAME, PLAYER } from '../../constants'
 import { COMMON_ACTIONS } from './type'
 
@@ -12,6 +12,8 @@ export interface IPlayer {
   status: TPlayerStatus | null
   role: TPlayerType
   color: string | null
+  duelResult?: TDuelResult
+  socketId: string | null
 }
 
 export interface IRoom {
@@ -44,6 +46,8 @@ const initialState: IGameState = {
   inGame: false,
   idRoom: null,
   thisPlayer: {
+    socketId: null,
+    duelResult: undefined,
     username: '',
     status: null,
     role: 'PLAYER',
@@ -71,6 +75,7 @@ export const gameReducer: (state: IGameState, action: any) => IGameState = (
     case GAME.START:
     case PLAYER.SHUFFLE_DECK:
     case PLAYER.HOLD:
+    case PLAYER.SHOW_HAND:
       console.log('payload', action.payload)
       return {
         ...state,

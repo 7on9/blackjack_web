@@ -7,7 +7,7 @@ export interface ICard {
   value: TCardValue
 }
 
-export type TPlayerStatus = 'STAND' | 'DRAW' | 'WAITING'
+export type TPlayerStatus = 'STAND' | 'DRAW' | 'WAITING' | 'SHOW_HAND'
 
 export type TDeckValueStatus = 'NOT_ENOUGHT_POINT' | 'ENOUGHT_POINT' | 'OVER_POINT' | 'DOUBLE_ACE' | 'BLACK_JACK' | 'DEATH_FLAG' | 'FIVE_STARS'
 
