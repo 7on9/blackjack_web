@@ -4,7 +4,10 @@
   "private": true,
   "dependencies": {
     "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "express-favicon": "^2.0.1",
     "helmet": "^4.4.1",
+    "path": "^0.12.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.2",
@@ -18,7 +21,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "release": "node server.js"
   },
   "eslintConfig": {
     "extends": [
