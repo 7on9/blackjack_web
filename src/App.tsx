@@ -36,66 +36,80 @@ const App = () => {
   const PlayingButtons: FC<{ player?: IPlayer }> = ({ player }) => {
     // console.log('player', player)
     const onDrawCard = () => {
-      gameState && gameState.idRoom && player && GAME_ACTIONS.drawCard(gameState.idRoom, player.username)
+      gameState &&
+        gameState.idRoom &&
+        player &&
+        GAME_ACTIONS.drawCard(gameState.idRoom, player.username)
     }
-    
+
     const onStand = () => {
-      gameState && gameState.idRoom && player && GAME_ACTIONS.hold(gameState.idRoom, player.username)
+      gameState &&
+        gameState.idRoom &&
+        player &&
+        GAME_ACTIONS.hold(gameState.idRoom, player.username)
     }
-    
+
     const onShowHand = (role: TPlayerType) => {
-      gameState && gameState.idRoom && player && GAME_ACTIONS.showHand(gameState.idRoom, player.username, role)
+      gameState &&
+        gameState.idRoom &&
+        player &&
+        GAME_ACTIONS.showHand(gameState.idRoom, player.username, role)
     }
-    
-    return player ? thisPlayer.role != 'HOST' || player.role == 'HOST' ? (
-      <div className="d-flex" style={{ flex: 1 }}>
-        <button
-          onClick={onDrawCard}
-          style={{ flex: 1, margin: 4 }}
-          type="button"
-          {...(player.status === 'DRAW'
-            ? { disabled: false }
-            : { disabled: true })}
-          className="btn btn-success">
-          Bốc
-        </button>
-        {player.role === 'PLAYER' && <button
-          onClick={onStand}
-          style={{ flex: 1, margin: 4 }}
-          type="button"
-          {...(player.status === 'DRAW'
-            ? { disabled: false }
-            : { disabled: true })}
-          className="btn btn-danger">
-          Dằn
-        </button>}
-        <button
-          onClick={() => onShowHand(player.role)}
-          style={{ flex: 1, margin: 4 }}
-          type="button"
-          {...(player.status === 'DRAW'
-            ? { disabled: false }
-            : { disabled: true })}
-          className="btn btn-warning">
-          Show hand
-        </button>
-        {/* <button
+
+    return player ? (
+      thisPlayer.role != 'HOST' || player.role == 'HOST' ? (
+        <div className="d-flex" style={{ flex: 1 }}>
+          <button
+            onClick={onDrawCard}
+            style={{ flex: 1, margin: 4 }}
+            type="button"
+            {...(player.status === 'DRAW'
+              ? { disabled: false }
+              : { disabled: true })}
+            className="btn btn-success">
+            Bốc
+          </button>
+          {player.role === 'PLAYER' && (
+            <button
+              onClick={onStand}
+              style={{ flex: 1, margin: 4 }}
+              type="button"
+              {...(player.status === 'DRAW'
+                ? { disabled: false }
+                : { disabled: true })}
+              className="btn btn-danger">
+              Dằn
+            </button>
+          )}
+          <button
+            onClick={() => onShowHand(player.role)}
+            style={{ flex: 1, margin: 4 }}
+            type="button"
+            {...(player.status === 'DRAW'
+              ? { disabled: false }
+              : { disabled: true })}
+            className="btn btn-warning">
+            Show hand
+          </button>
+          {/* <button
     style={{ flex: 1, margin: 4 }}
     type="button"
     className="btn btn-primary">
     Bốc
   </button> */}
-      </div>
-    ) : (
-      <div className="d-flex" style={{ flex: 1 }}>
-        <button
-          onClick={() => onShowHand('HOST')}
-          style={{ flex: 1, margin: 4 }}
-          type="button"
-          className="btn btn-success">
-          Xét bài
-        </button>
-      </div>) : null
+        </div>
+      ) : (
+        <div className="d-flex" style={{ flex: 1 }}>
+          <button
+            onClick={() => onShowHand('HOST')}
+            style={{ flex: 1, margin: 4 }}
+            type="button"
+            className="btn btn-success">
+            Xét bài
+          </button>
+        </div>
+      )
+    ) : null
   }
 
   const PlayerPosition: FC<{
@@ -141,16 +155,19 @@ const App = () => {
               <span className="badge badge-danger">Dằn</span>
             )}
             <br />
-            {!player ? null : !player.duelResult ? null : player.duelResult === 'DRAW' ? (
-              <span className="badge badge-info">Hòa</span>
-            ) : player?.duelResult == 'WIN' ? (
-              <span className="badge badge-success">Thắng</span>
-            ) : (
-              <span className="badge badge-danger">Thua</span>
-            )}
+            {!player ? null : !player.duelResult ? null : player.duelResult ===
+              'DRAW' ? (
+                <span className="badge badge-info">Hòa</span>
+              ) : player?.duelResult == 'WIN' ? (
+                <span className="badge badge-success">Thắng</span>
+              ) : (
+                <span className="badge badge-danger">Thua</span>
+              )}
           </div>
 
-          {isThisPlayer || thisPlayer.role == 'HOST' ? <PlayingButtons player={player} /> : null}
+          {isThisPlayer || thisPlayer.role == 'HOST' ? (
+            <PlayingButtons player={player} />
+          ) : null}
         </div>
       </div>
     )
@@ -175,14 +192,18 @@ const App = () => {
     if (thisPlayer.role === 'HOST') {
       const isNewGame = confirm('Bạn có chắc muốn hủy game này?')
       if (isNewGame) {
-        gameState && GAME_ACTIONS.endGame(gameState.idRoom as number, gameState.thisPlayer.username)
+        gameState &&
+          GAME_ACTIONS.endGame(
+            gameState.idRoom as number,
+            gameState.thisPlayer.username
+          )
       }
     } else {
       const isNewGame = confirm('Out game?')
       if (isNewGame) {
-        dispatch({ 
+        dispatch({
           type: COMMON_ACTIONS.RESET,
-          payload: {}
+          payload: {},
         })
       }
     }
@@ -232,14 +253,16 @@ const App = () => {
             <td colSpan={2} rowSpan={2} style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
                 <br />
-                {
-                  !gameState || !gameState.room || !gameState.room.host ? null : gameState.room.host.status == null ? (
-                    <span className="badge badge-info">Đang đợi</span>
-                  ) : gameState.room.host.status === 'DRAW' ? (
-                    <span className="badge badge-success">Đang bốc</span>
-                  ) : (
-                    <span className="badge badge-danger">Dằn</span>
-                  )}
+                {!gameState ||
+                !gameState.room ||
+                !gameState.room.host ? null : gameState.room.host.status ==
+                  null ? (
+                      <span className="badge badge-info">Đang đợi</span>
+                    ) : gameState.room.host.status === 'DRAW' ? (
+                      <span className="badge badge-success">Đang bốc</span>
+                    ) : (
+                      <span className="badge badge-danger">Dằn</span>
+                    )}
               </div>
               <div
                 style={{
@@ -276,11 +299,18 @@ const App = () => {
                       card={
                         thisPlayer.role === 'HOST'
                           ? thisPlayer.cards[id]
-                          : gameState.room?.host?.cards
+                          : gameState.room?.host?.status === 'SHOW_HAND' ||
+                            (thisPlayer.status === 'SHOW_HAND' &&
+                              gameState.room?.host?.cards)
                             ? gameState.room?.host?.cards[id]
                             : undefined
                       }
-                      canFlip={thisPlayer.role === 'HOST'}
+                      defaultSide={gameState.room?.host?.status == 'SHOW_HAND' ? 'front' : 'back'}
+                      canFlip={
+                        thisPlayer.role === 'HOST' 
+                        // || gameState.room?.host?.status == 'SHOW_HAND'
+                        // || thisPlayer.status == 'SHOW_HAND'
+                      }
                       placeHolder={
                         !(
                           gameState.room?.host?.cards &&
@@ -347,7 +377,9 @@ const App = () => {
                   className="btn btn-info">
                   Kinh bài
                 </button> */}
-                <PlayingButtons player={thisPlayer.role == 'HOST' ? thisPlayer : undefined} />
+                <PlayingButtons
+                  player={thisPlayer.role == 'HOST' ? thisPlayer : undefined}
+                />
               </div>
             </td>
             <td>
